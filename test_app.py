@@ -57,10 +57,14 @@ class TestAppSuite(unittest.TestCase):
         for col in expected_columns:
             self.assertIn(col, column_names)
 
-    @unittest.skip("Pendiente de implementación en Baby Step 2.3")
     def test_baby_step_2_3_seed_data(self):
         """Baby Step 2.3: Verificación de datos semilla iniciales"""
-        pass
+        from app import init_db, get_db_connection
+        init_db()
+        conn = get_db_connection()
+        count = conn.execute("SELECT COUNT(*) FROM envios").fetchone()[0]
+        conn.close()
+        self.assertGreaterEqual(count, 3)
 
     # =========================================================================
     # BLOQUE 3 a 8: Endpoints API REST (GET, POST, PUT, DELETE)
