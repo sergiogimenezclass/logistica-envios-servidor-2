@@ -1,4 +1,5 @@
 import unittest
+import sqlite3
 from app import app
 
 class TestAppSuite(unittest.TestCase):
@@ -32,10 +33,13 @@ class TestAppSuite(unittest.TestCase):
     # BLOQUE 2: Base de Datos SQLite e Inicialización
     # =========================================================================
 
-    @unittest.skip("Pendiente de implementación en Baby Step 2.1")
     def test_baby_step_2_1_db_connection(self):
         """Baby Step 2.1: Función conector a SQLite database.db"""
-        pass
+        from app import get_db_connection
+        conn = get_db_connection()
+        self.assertIsNotNone(conn)
+        self.assertIsInstance(conn, sqlite3.Connection)
+        conn.close()
 
     @unittest.skip("Pendiente de implementación en Baby Step 2.2")
     def test_baby_step_2_2_table_schema(self):
