@@ -20,7 +20,6 @@ class TestAppSuite(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('<!DOCTYPE html>', response.get_data(as_text=True))
 
-    @unittest.skip("Pendiente de implementación en Baby Step 1.3")
     def test_baby_step_1_3_static_files(self):
         """Baby Step 1.3: Servicio de archivos estáticos (styles.css y app.js)"""
         res_css = self.client.get('/styles.css')
