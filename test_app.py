@@ -41,10 +41,21 @@ class TestAppSuite(unittest.TestCase):
         self.assertIsInstance(conn, sqlite3.Connection)
         conn.close()
 
-    @unittest.skip("Pendiente de implementación en Baby Step 2.2")
     def test_baby_step_2_2_table_schema(self):
         """Baby Step 2.2: Verificación de la tabla 'envios' y sus columnas"""
-        pass
+        from app import init_db, get_db_connection
+        init_db()
+        conn = get_db_connection()
+        columns_info = conn.execute("PRAGMA table_info(envios)").fetchall()
+        column_names = [col['name'] for col in columns_info]
+        conn.close()
+
+        expected_columns = [
+            'id', 'tracking_code', 'recipient', 'address', 
+            'status', 'package_type', 'pin', 'lat', 'lon', 'created_at'
+        ]
+        for col in expected_columns:
+            self.assertIn(col, column_names)
 
     @unittest.skip("Pendiente de implementación en Baby Step 2.3")
     def test_baby_step_2_3_seed_data(self):
