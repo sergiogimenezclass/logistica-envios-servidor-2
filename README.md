@@ -16,6 +16,14 @@ En ambos casos, la interactividad se programa en **pasos progresivos (baby steps
 
 ---
 
+> 📌 **Fase 2 — Desarrollo Backend con Python (Flask) y SQLite**
+> 
+> Este repositorio corresponde a la **Fase 2** del proyecto. El objetivo actual es construir un servidor RESTful utilizando **Python**, **Flask** y una base de datos relacional **SQLite** (`database.db`) para reemplazar la persistencia estática en `localStorage` y centralizar la gestión de datos.
+> 
+> 🔗 **Versión anterior (Fase 1 - Prototipo 100% Frontend):** Podés consultar la versión previa orientada exclusivamente al cliente (HTML5, CSS Vainilla y JS autónomo) en el repositorio original [logistica-envios](https://github.com/sergiogimenezclass/logistica-envios). Además, en este proyecto podés encontrar el código JavaScript completo de la Fase 1 guardado en [`app_fase1.js`](file:///home/sergio/Documents/src/programador%202026/logistica-envio-server/app_fase1.js).
+
+---
+
 ## 🛠️ Las tres partes del proyecto
 
 Una página web se divide en tres capas fundamentales:
