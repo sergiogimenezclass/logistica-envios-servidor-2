@@ -66,6 +66,16 @@ class TestAppSuite(unittest.TestCase):
         conn.close()
         self.assertGreaterEqual(count, 3)
 
+    def test_baby_step_2_4_auto_init(self):
+        """Baby Step 2.4: Auto-inicialización de la BD al cargar la app"""
+        import os
+        from app import get_db_connection
+        self.assertTrue(os.path.exists('database.db'))
+        conn = get_db_connection()
+        count = conn.execute("SELECT COUNT(*) FROM envios").fetchone()[0]
+        conn.close()
+        self.assertGreaterEqual(count, 3)
+
     # =========================================================================
     # BLOQUE 3 a 8: Endpoints API REST (GET, POST, PUT, DELETE)
     # =========================================================================

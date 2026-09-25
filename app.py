@@ -43,10 +43,13 @@ def init_db():
     conn.commit()
     conn.close()
 
+# Auto-inicialización de la base de datos al importar el módulo
+with app.app_context():
+    init_db()
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    init_db()
     app.run(host='0.0.0.0', port=5000, debug=True)
