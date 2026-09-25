@@ -15,17 +15,17 @@ class TestAppSuite(unittest.TestCase):
         self.assertIsNotNone(app)
 
     def test_baby_step_1_2_root_route(self):
-        """Baby Step 1.2: Ruta raíz '/' sirve index.html con HTTP 200 OK"""
+        """Baby Step 1.2: Ruta raíz '/' sirve index.html mediante render_template con HTTP 200 OK"""
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         self.assertIn('<!DOCTYPE html>', response.get_data(as_text=True))
 
     def test_baby_step_1_3_static_files(self):
-        """Baby Step 1.3: Servicio de archivos estáticos (styles.css y app.js)"""
-        res_css = self.client.get('/styles.css')
+        """Baby Step 1.3: Servicio de archivos estáticos (/static/css/styles.css y /static/js/app.js)"""
+        res_css = self.client.get('/static/css/styles.css')
         self.assertEqual(res_css.status_code, 200)
 
-        res_js = self.client.get('/app.js')
+        res_js = self.client.get('/static/js/app.js')
         self.assertEqual(res_js.status_code, 200)
 
     # =========================================================================
