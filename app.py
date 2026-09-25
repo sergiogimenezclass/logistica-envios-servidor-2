@@ -1,11 +1,6 @@
-from flask import Flask, send_from_directory
+from flask import Flask
 
-app = Flask(__name__, static_folder='.', static_url_path='')
-
-@app.route('/')
-def serve_index():
-    return send_from_directory('.', 'index.html')
+app = Flask(__name__)
 
 if __name__ == '__main__':
-    print("Iniciando Servidor LogiTrack Express (Fase 2)...")
     app.run(host='0.0.0.0', port=5000, debug=True)
