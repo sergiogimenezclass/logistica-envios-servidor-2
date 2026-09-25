@@ -27,14 +27,21 @@ En esta etapa migramos el prototipo desde una persistencia local en el navegador
 
 ```text
 logistica-envios-servidor-2/
-├── app.py           # Servidor Flask y Endpoints API REST (Fase 2)
-├── database.db      # Base de datos SQLite (se genera en la inicialización)
-├── app.js           # Lógica JavaScript conectada a la API Flask
-├── app_fase1.js     # Resguardo de código JS cliente de la Fase 1
-├── index.html       # Maqueta semántica HTML5
-├── styles.css       # Estilos CSS Vainilla
-├── contexto.md      # Especificación técnica del proyecto
-└── README.md        # Documentación de la Fase 2
+├── app.py               # Servidor principal Flask y API REST
+├── test_app.py          # Suite de pruebas unitarias
+├── database.db          # Base de datos SQLite (se genera en la inicialización)
+├── doc/                 # Documentación pedagógica
+│   ├── contexto.md      # Especificación técnica del proyecto
+│   └── pasos_fase2.md   # Guía detallada de baby steps y tests
+├── templates/
+│   └── index.html       # Maqueta semántica HTML5 servida por render_template()
+├── static/
+│   ├── css/
+│   │   └── styles.css   # Estilos CSS Vainilla en /static/css/styles.css
+│   └── js/
+│       ├── app.js       # Código JavaScript de Fase 2 en /static/js/app.js
+│       └── app_fase1.js # Resguardo de código JS cliente de la Fase 1
+└── README.md            # Documentación general del proyecto
 ```
 
 ---

@@ -4,6 +4,31 @@ Este documento especifica la **Fase 2** dividida en **baby steps** (micro-pasos 
 
 ---
 
+## 🏛️ Convención de Estructura Estándar de Flask
+
+En Flask, la arquitectura profesional exige separar el proyecto en carpetas específicas:
+- `templates/`: Almacena las plantillas HTML (ej: `templates/index.html`). Flask las sirve de forma nativa mediante `render_template('index.html')`.
+- `static/`: Contiene los archivos estáticos públicos (`static/css/styles.css` y `static/js/app.js`). Flask expone automáticamente esta carpeta bajo la ruta `/static/...`.
+
+```text
+logistica-envios-servidor-2/
+├── app.py                   # Servidor Flask y API REST
+├── test_app.py              # Suite de pruebas unitarias
+├── doc/                     # Documentación pedagógica
+│   ├── contexto.md
+│   └── pasos_fase2.md
+├── templates/
+│   └── index.html           # Vistas HTML servidas por render_template()
+└── static/
+    ├── css/
+    │   └── styles.css       # Hoja de estilos en /static/css/styles.css
+    └── js/
+        ├── app.js           # JavaScript activo en /static/js/app.js
+        └── app_fase1.js     # Resguardo de Fase 1
+```
+
+---
+
 ## 🔹 Bloque 1: Servidor Flask Base y Archivos Estáticos
 
 ### 🐾 Baby Step 1.1: Preparación del entorno y creación de `app.py`
@@ -11,15 +36,15 @@ Este documento especifica la **Fase 2** dividida en **baby steps** (micro-pasos 
 - **Test Unitario:** `test_baby_step_1_1_app_exists` en `test_app.py`.
 - **Verificación:** `python3 -m unittest test_app.py` valida que `app` sea un objeto Flask válido.
 
-### 🐾 Baby Step 1.2: Configuración de la ruta raíz (`/`)
-- **Desarrollo:** Decorador `@app.route('/')` sirviendo `index.html` mediante `send_from_directory`.
+### 🐾 Baby Step 1.2: Configuración de la ruta raíz (`/`) y `render_template`
+- **Desarrollo:** Decorador `@app.route('/')` sirviendo `index.html` desde la carpeta `templates/` mediante `render_template('index.html')`.
 - **Test Unitario:** `test_baby_step_1_2_root_route` en `test_app.py`.
 - **Verificación:** Valida `status_code == 200` y presencia del encabezado `<!DOCTYPE html>`.
 
-### 🐾 Baby Step 1.3: Servicio de archivos estáticos (`styles.css`, `app.js`)
-- **Desarrollo:** Configuración de `static_folder='.'` y `static_url_path=''` en `app.py`.
+### 🐾 Baby Step 1.3: Servicio de archivos estáticos (`/static/css/styles.css`, `/static/js/app.js`)
+- **Desarrollo:** Uso de la ruta estática nativa de Flask para entregar CSS y JS desde la carpeta `static/`.
 - **Test Unitario:** `test_baby_step_1_3_static_files` en `test_app.py`.
-- **Verificación:** Valida `status_code == 200` para `/styles.css` y `/app.js`.
+- **Verificación:** Valida `status_code == 200` para `/static/css/styles.css` y `/static/js/app.js`.
 
 ### 🐾 Baby Step 1.4: Lanzamiento y prueba en puerto 5000
 - **Desarrollo:** Ejecución de `app.run(host='0.0.0.0', port=5000)`.
