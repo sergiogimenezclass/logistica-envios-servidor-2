@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 
 app = Flask(__name__)
 
@@ -68,6 +68,41 @@ def get_envio_by_tracking(tracking_code):
         return jsonify({'error': 'Envío no encontrado'}), 404
         
     return jsonify(dict(envio)), 200
+
+@app.route('/api/envios', methods=['POST'])
+def create_envio():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Payload JSON requerido'}), 400
+
+    tracking_code = data.get('tracking_code') or data.get('trackingCode')
+    recipient = data.get('recipient')
+    address = data.get('address')
+    status = data.get('status', 'En preparación')
+    package_type = data.get('package_type') or data.get('packageType', 'FedEx Express Standard')
+    pin = data.get('pin', '0000')
+    lat = data.get('lat')
+    lon = data.get('lon')
+
+    if not tracking_code or not recipient or not address:
+        return jsonify({'error': 'Faltan campos obligatorios (tracking_code, recipient, address)'}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            INSERT INTO envios (tracking_code, recipient, address, status, package_type, pin, lat, lon)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (tracking_code, recipient, address, status, package_type, pin, lat, lon))
+        conn.commit()
+        new_id = cursor.lastrowid
+        new_envio = conn.execute('SELECT * FROM envios WHERE id = ?', (new_id,)).fetchone()
+        conn.close()
+        return jsonify(dict(new_envio)), 201
+    except sqlite3.IntegrityError:
+        conn.close()
+        return jsonify({'error': 'El código de seguimiento ya existe'}), 400
+
 
 
 if __name__ == '__main__':
