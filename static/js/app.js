@@ -948,20 +948,38 @@ shipmentForm.addEventListener("submit", async (e) => {
         }
     } else {
         const coords = await geocodeAddress(address);
-        const newShipment = {
-            id: Date.now(),
-            trackingCode,
-            recipient,
-            address,
-            status,
-            packageType,
-            pin,
+        const newShipmentData = {
+            tracking_code: trackingCode,
+            recipient: recipient,
+            address: address,
+            status: status,
+            package_type: packageType,
+            pin: pin,
             lat: coords.lat,
             lon: coords.lon
         };
-        shipments.unshift(newShipment);
-        showToast(`Envío ${trackingCode} dado de alta`, "success");
-        selectShipmentForSimulation(newShipment);
+
+        try {
+            const response = await fetch('/api/envios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newShipmentData)
+            });
+
+            if (response.ok) {
+                const createdItem = await response.json();
+                const normalized = normalizeShipment(createdItem);
+                shipments.unshift(normalized);
+                showToast(`Envío ${trackingCode} dado de alta en SQLite`, "success");
+                selectShipmentForSimulation(normalized);
+            } else {
+                const errData = await response.json();
+                showToast(errData.error || "Error al registrar envío", "error");
+            }
+        } catch (err) {
+            console.error("Error en POST /api/envios:", err);
+            showToast("Error de conexión con el servidor", "error");
+        }
     }
 
     btnSubmit.disabled = false;

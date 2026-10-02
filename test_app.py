@@ -111,8 +111,10 @@ class TestAppSuite(unittest.TestCase):
 
     def test_baby_step_6_1_create_shipment(self):
         """Endpoint POST /api/envios crea un nuevo envío (201 Created)"""
+        import time
+        unique_code = f"AR-POST-{int(time.time() * 1000) % 10000}"
         new_payload = {
-            'tracking_code': 'AR-7777',
+            'tracking_code': unique_code,
             'recipient': 'Gonzalo Pérez',
             'address': 'Av. Santa Fe 2000, CABA',
             'status': 'En preparación',
@@ -125,12 +127,13 @@ class TestAppSuite(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         data = response.get_json()
         self.assertIn('id', data)
-        self.assertEqual(data['tracking_code'], 'AR-7777')
+        self.assertEqual(data['tracking_code'], unique_code)
         self.assertEqual(data['recipient'], 'Gonzalo Pérez')
 
         # Prueba con campos faltantes (400 Bad Request)
         bad_response = self.client.post('/api/envios', json={'recipient': 'Incompleto'})
         self.assertEqual(bad_response.status_code, 400)
+
 
 
     @unittest.skip("Pendiente de implementación en Baby Step 7.1")
