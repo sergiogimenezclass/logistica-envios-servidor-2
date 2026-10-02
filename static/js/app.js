@@ -740,11 +740,27 @@ window.trackFromOperator = function (code) {
     selectShipmentForSimulationByCode(code);
 };
 
-window.deleteShipment = function (id) {
-    shipments = shipments.filter(s => s.id !== id);
-    renderShipmentsTable();
-    refreshMapMarkers();
-    showToast("Envío eliminado del registro", "info");
+window.deleteShipment = async function (id) {
+    if (!confirm("¿Estás seguro de que deseas eliminar este envío?")) return;
+
+    try {
+        const response = await fetch(`/api/envios/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            shipments = shipments.filter(s => s.id !== id);
+            renderShipmentsTable();
+            refreshMapMarkers();
+            showToast("Envío eliminado de SQLite", "info");
+        } else {
+            const errData = await response.json();
+            showToast(errData.error || "Error al eliminar el envío", "error");
+        }
+    } catch (err) {
+        console.error("Error en DELETE /api/envios:", err);
+        showToast("Error de conexión al eliminar", "error");
+    }
 };
 
 window.prepareEdit = function (id) {

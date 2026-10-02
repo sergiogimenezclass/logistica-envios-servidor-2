@@ -138,11 +138,14 @@ class TestAppSuite(unittest.TestCase):
 
     def test_baby_step_7_1_update_shipment(self):
         """Endpoint PUT /api/envios/<id> actualiza estado/PIN (200 OK)"""
+        import uuid
+        unique_code = f"AR-PUT-{uuid.uuid4().hex[:6]}"
         create_res = self.client.post('/api/envios', json={
-            'tracking_code': 'AR-PUT-100',
+            'tracking_code': unique_code,
             'recipient': 'Original Recipient',
             'address': 'Original Address'
         })
+        self.assertEqual(create_res.status_code, 201)
         new_id = create_res.get_json()['id']
 
         update_payload = {'status': 'Entregado', 'recipient': 'Modificado Recipient'}
@@ -156,16 +159,16 @@ class TestAppSuite(unittest.TestCase):
         res_404 = self.client.put('/api/envios/999999', json={'status': 'Entregado'})
         self.assertEqual(res_404.status_code, 404)
 
-
-
     def test_baby_step_8_1_delete_shipment(self):
         """Endpoint DELETE /api/envios/<id> elimina un registro (200 OK)"""
-        # Primero crear un envío auxiliar para eliminar
+        import uuid
+        unique_code = f"AR-DEL-{uuid.uuid4().hex[:6]}"
         create_res = self.client.post('/api/envios', json={
-            'tracking_code': 'AR-DEL-999',
+            'tracking_code': unique_code,
             'recipient': 'Para Eliminar',
             'address': 'Direccion Test'
         })
+        self.assertEqual(create_res.status_code, 201)
         new_id = create_res.get_json()['id']
 
         # Eliminar el envío recién creado
@@ -173,7 +176,9 @@ class TestAppSuite(unittest.TestCase):
         self.assertEqual(del_res.status_code, 200)
 
         # Verificar que ya no exista (404)
-        get_res = self.client.get(f'/api/envios/AR-DEL-999')
+        get_res = self.client.get(f'/api/envios/{unique_code}')
+        self.assertEqual(get_res.status_code, 404)
+
         self.assertEqual(get_res.status_code, 404)
 
         # Probar eliminación de ID inexistente

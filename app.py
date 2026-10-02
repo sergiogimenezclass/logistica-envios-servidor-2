@@ -101,6 +101,8 @@ def create_envio():
         return jsonify(dict(new_envio)), 201
     except sqlite3.IntegrityError:
         conn.close()
+        return jsonify({'error': 'El código de seguimiento ya existe'}), 400
+
 @app.route('/api/envios/<int:envio_id>', methods=['PUT'])
 def update_envio(envio_id):
     data = request.get_json()
