@@ -109,10 +109,29 @@ class TestAppSuite(unittest.TestCase):
         self.assertIn('error', data_404)
 
 
-    @unittest.skip("Pendiente de implementación en Baby Step 6.1")
     def test_baby_step_6_1_create_shipment(self):
-        """Baby Step 6.1: Endpoint POST /api/envios crea un nuevo envío (201 Created)"""
-        pass
+        """Endpoint POST /api/envios crea un nuevo envío (201 Created)"""
+        new_payload = {
+            'tracking_code': 'AR-7777',
+            'recipient': 'Gonzalo Pérez',
+            'address': 'Av. Santa Fe 2000, CABA',
+            'status': 'En preparación',
+            'package_type': 'FedEx Box Estándar',
+            'pin': '5555',
+            'lat': -34.59,
+            'lon': -58.39
+        }
+        response = self.client.post('/api/envios', json=new_payload)
+        self.assertEqual(response.status_code, 201)
+        data = response.get_json()
+        self.assertIn('id', data)
+        self.assertEqual(data['tracking_code'], 'AR-7777')
+        self.assertEqual(data['recipient'], 'Gonzalo Pérez')
+
+        # Prueba con campos faltantes (400 Bad Request)
+        bad_response = self.client.post('/api/envios', json={'recipient': 'Incompleto'})
+        self.assertEqual(bad_response.status_code, 400)
+
 
     @unittest.skip("Pendiente de implementación en Baby Step 7.1")
     def test_baby_step_7_1_update_shipment(self):
