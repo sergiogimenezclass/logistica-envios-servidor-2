@@ -133,7 +133,22 @@ def update_envio(envio_id):
     conn.close()
     return jsonify(dict(updated_envio)), 200
 
+@app.route('/api/envios/<int:envio_id>', methods=['DELETE'])
+
+def delete_envio(envio_id):
+    conn = get_db_connection()
+    envio = conn.execute('SELECT * FROM envios WHERE id = ?', (envio_id,)).fetchone()
+    if envio is None:
+        conn.close()
+        return jsonify({'error': 'Envío no encontrado'}), 404
+
+    conn.execute('DELETE FROM envios WHERE id = ?', (envio_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Envío eliminado correctamente'}), 200
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
 
 

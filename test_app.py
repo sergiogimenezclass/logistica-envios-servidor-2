@@ -138,22 +138,48 @@ class TestAppSuite(unittest.TestCase):
 
     def test_baby_step_7_1_update_shipment(self):
         """Endpoint PUT /api/envios/<id> actualiza estado/PIN (200 OK)"""
-        update_payload = {'status': 'Entregado', 'recipient': 'Lucía Fernández Modificada'}
-        response = self.client.put('/api/envios/1', json=update_payload)
+        create_res = self.client.post('/api/envios', json={
+            'tracking_code': 'AR-PUT-100',
+            'recipient': 'Original Recipient',
+            'address': 'Original Address'
+        })
+        new_id = create_res.get_json()['id']
+
+        update_payload = {'status': 'Entregado', 'recipient': 'Modificado Recipient'}
+        response = self.client.put(f'/api/envios/{new_id}', json=update_payload)
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
         self.assertEqual(data['status'], 'Entregado')
-        self.assertEqual(data['recipient'], 'Lucía Fernández Modificada')
+        self.assertEqual(data['recipient'], 'Modificado Recipient')
 
         # Prueba con ID inexistente (404 Not Found)
         res_404 = self.client.put('/api/envios/999999', json={'status': 'Entregado'})
         self.assertEqual(res_404.status_code, 404)
 
 
-    @unittest.skip("Pendiente de implementación en Baby Step 8.1")
+
     def test_baby_step_8_1_delete_shipment(self):
-        """Baby Step 8.1: Endpoint DELETE /api/envios/<id> elimina un registro (200/204)"""
-        pass
+        """Endpoint DELETE /api/envios/<id> elimina un registro (200 OK)"""
+        # Primero crear un envío auxiliar para eliminar
+        create_res = self.client.post('/api/envios', json={
+            'tracking_code': 'AR-DEL-999',
+            'recipient': 'Para Eliminar',
+            'address': 'Direccion Test'
+        })
+        new_id = create_res.get_json()['id']
+
+        # Eliminar el envío recién creado
+        del_res = self.client.delete(f'/api/envios/{new_id}')
+        self.assertEqual(del_res.status_code, 200)
+
+        # Verificar que ya no exista (404)
+        get_res = self.client.get(f'/api/envios/AR-DEL-999')
+        self.assertEqual(get_res.status_code, 404)
+
+        # Probar eliminación de ID inexistente
+        del_404 = self.client.delete('/api/envios/999999')
+        self.assertEqual(del_404.status_code, 404)
+
 
 if __name__ == '__main__':
     unittest.main()
