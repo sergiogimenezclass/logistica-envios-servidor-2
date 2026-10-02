@@ -557,7 +557,7 @@ function validateDeliveryPin() {
     }
 }
 
-function completeSimulation() {
+async function completeSimulation() {
     simProgressBar.style.width = "100%";
     simProgressText.textContent = "100%";
     renderTimeline(100);
@@ -565,10 +565,23 @@ function completeSimulation() {
     if (activeSimulatedShipment) {
         activeSimulatedShipment.status = "Entregado";
         clientStatusBadge.innerHTML = getStatusBadgeHtml("Entregado");
+
+        try {
+            const response = await fetch(`/api/envios/${activeSimulatedShipment.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'Entregado' })
+            });
+            if (response.ok) {
+                showToast(`Envío ${activeSimulatedShipment.trackingCode} marcado como Entregado en SQLite`, "success");
+            }
+        } catch (err) {
+            console.error("Error al actualizar estado en backend:", err);
+        }
+
         renderShipmentsTable();
         refreshMapMarkers();
         updateOperatorStats();
-        showToast(`Envío ${activeSimulatedShipment.trackingCode} entregado formalmente`, "success");
     }
 }
 
@@ -932,19 +945,45 @@ shipmentForm.addEventListener("submit", async (e) => {
     if (id) {
         const item = shipments.find(s => s.id === parseInt(id));
         if (item) {
-            item.trackingCode = trackingCode;
-            item.recipient = recipient;
-            item.status = status;
-            item.packageType = packageType;
-            item.pin = pin;
-
+            let lat = item.lat;
+            let lon = item.lon;
             if (item.address !== address) {
-                item.address = address;
                 const coords = await geocodeAddress(address);
-                item.lat = coords.lat;
-                item.lon = coords.lon;
+                lat = coords.lat;
+                lon = coords.lon;
             }
-            showToast(`Envío ${trackingCode} actualizado`, "info");
+
+            const updateData = {
+                tracking_code: trackingCode,
+                recipient: recipient,
+                address: address,
+                status: status,
+                package_type: packageType,
+                pin: pin,
+                lat: lat,
+                lon: lon
+            };
+
+            try {
+                const response = await fetch(`/api/envios/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+                if (response.ok) {
+                    const updated = await response.json();
+                    const normalized = normalizeShipment(updated);
+                    const idx = shipments.findIndex(s => s.id === parseInt(id));
+                    if (idx !== -1) shipments[idx] = normalized;
+                    showToast(`Envío ${trackingCode} actualizado en SQLite`, "info");
+                } else {
+                    const errData = await response.json();
+                    showToast(errData.error || "Error al actualizar envío", "error");
+                }
+            } catch (err) {
+                console.error("Error en PUT /api/envios:", err);
+                showToast("Error de conexión al actualizar", "error");
+            }
         }
     } else {
         const coords = await geocodeAddress(address);
