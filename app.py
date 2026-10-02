@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 
 app = Flask(__name__)
 
@@ -51,5 +51,25 @@ with app.app_context():
 def index():
     return render_template('index.html')
 
+@app.route('/api/envios', methods=['GET'])
+def get_envios():
+    conn = get_db_connection()
+    envios = conn.execute('SELECT * FROM envios').fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in envios]), 200
+
+@app.route('/api/envios/<tracking_code>', methods=['GET'])
+def get_envio_by_tracking(tracking_code):
+    conn = get_db_connection()
+    envio = conn.execute('SELECT * FROM envios WHERE tracking_code = ?', (tracking_code,)).fetchone()
+    conn.close()
+    
+    if envio is None:
+        return jsonify({'error': 'Envío no encontrado'}), 404
+        
+    return jsonify(dict(envio)), 200
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+

@@ -80,15 +80,34 @@ class TestAppSuite(unittest.TestCase):
     # BLOQUE 3 a 8: Endpoints API REST (GET, POST, PUT, DELETE)
     # =========================================================================
 
-    @unittest.skip("Pendiente de implementación en Baby Step 3.1")
     def test_baby_step_3_1_get_all_shipments(self):
         """Baby Step 3.1: Endpoint GET /api/envios retorna lista JSON"""
-        pass
+        response = self.client.get('/api/envios')
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertIsInstance(data, list)
+        self.assertGreaterEqual(len(data), 3)
+        for item in data:
+            self.assertIn('tracking_code', item)
+            self.assertIn('recipient', item)
+            self.assertIn('status', item)
 
-    @unittest.skip("Pendiente de implementación en Baby Step 5.1")
+
     def test_baby_step_5_1_get_single_shipment(self):
         """Baby Step 5.1: Endpoint GET /api/envios/<tracking_code> (200 OK / 404 Not Found)"""
-        pass
+        # Prueba con guía existente
+        response = self.client.get('/api/envios/AR-1001')
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertEqual(data['tracking_code'], 'AR-1001')
+        self.assertEqual(data['recipient'], 'Lucía Fernández')
+
+        # Prueba con guía inexistente
+        response_404 = self.client.get('/api/envios/AR-9999')
+        self.assertEqual(response_404.status_code, 404)
+        data_404 = response_404.get_json()
+        self.assertIn('error', data_404)
+
 
     @unittest.skip("Pendiente de implementación en Baby Step 6.1")
     def test_baby_step_6_1_create_shipment(self):
