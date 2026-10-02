@@ -101,10 +101,39 @@ def create_envio():
         return jsonify(dict(new_envio)), 201
     except sqlite3.IntegrityError:
         conn.close()
-        return jsonify({'error': 'El código de seguimiento ya existe'}), 400
+@app.route('/api/envios/<int:envio_id>', methods=['PUT'])
+def update_envio(envio_id):
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Payload JSON requerido'}), 400
 
+    conn = get_db_connection()
+    envio = conn.execute('SELECT * FROM envios WHERE id = ?', (envio_id,)).fetchone()
+    if envio is None:
+        conn.close()
+        return jsonify({'error': 'Envío no encontrado'}), 404
 
+    tracking_code = data.get('tracking_code') or data.get('trackingCode') or envio['tracking_code']
+    recipient = data.get('recipient') or envio['recipient']
+    address = data.get('address') or envio['address']
+    status = data.get('status') or envio['status']
+    package_type = data.get('package_type') or data.get('packageType') or envio['package_type']
+    pin = data.get('pin') or envio['pin']
+    lat = data.get('lat') if 'lat' in data else envio['lat']
+    lon = data.get('lon') if 'lon' in data else envio['lon']
+
+    conn.execute('''
+        UPDATE envios
+        SET tracking_code = ?, recipient = ?, address = ?, status = ?, package_type = ?, pin = ?, lat = ?, lon = ?
+        WHERE id = ?
+    ''', (tracking_code, recipient, address, status, package_type, pin, lat, lon, envio_id))
+    conn.commit()
+
+    updated_envio = conn.execute('SELECT * FROM envios WHERE id = ?', (envio_id,)).fetchone()
+    conn.close()
+    return jsonify(dict(updated_envio)), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
 

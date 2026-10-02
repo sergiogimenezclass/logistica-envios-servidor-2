@@ -136,10 +136,19 @@ class TestAppSuite(unittest.TestCase):
 
 
 
-    @unittest.skip("Pendiente de implementación en Baby Step 7.1")
     def test_baby_step_7_1_update_shipment(self):
-        """Baby Step 7.1: Endpoint PUT /api/envios/<id> actualiza estado/PIN (200 OK)"""
-        pass
+        """Endpoint PUT /api/envios/<id> actualiza estado/PIN (200 OK)"""
+        update_payload = {'status': 'Entregado', 'recipient': 'Lucía Fernández Modificada'}
+        response = self.client.put('/api/envios/1', json=update_payload)
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertEqual(data['status'], 'Entregado')
+        self.assertEqual(data['recipient'], 'Lucía Fernández Modificada')
+
+        # Prueba con ID inexistente (404 Not Found)
+        res_404 = self.client.put('/api/envios/999999', json={'status': 'Entregado'})
+        self.assertEqual(res_404.status_code, 404)
+
 
     @unittest.skip("Pendiente de implementación en Baby Step 8.1")
     def test_baby_step_8_1_delete_shipment(self):
